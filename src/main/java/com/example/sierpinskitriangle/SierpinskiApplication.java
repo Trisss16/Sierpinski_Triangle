@@ -22,7 +22,12 @@ public class SierpinskiApplication extends Application {
     private int counter;
 
     private Point2D[] triangle;
-    private ArrayList <Point2D> points;
+    //private ArrayList <Point2D> points;
+    private Point2D lastPoint;
+
+    /*OPTIMIZACIÓN: en lugar de renderizar cada vez todos los puntos que se han generado hasta el momento, se guarda solo el último
+    * punto y se dibuja. En render se evita limpiar el canvas para dejar todos los puntos dibujados anteriormente y que en cada
+    * llamada solo se dibuje el último punto encima de lo que ya había, en lugar de dibujarlos todos cada vez y disminuir el rendimiento*/
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -62,10 +67,10 @@ public class SierpinskiApplication extends Application {
     private void load() {
         //crea el triángulo y el arreglo de puntos
         triangle = generateEquilateralTriangle(s);
-        points = new ArrayList<>();
+        //points = new ArrayList<>();
 
         //genera el primer punto aleatoriamente
-        points.add(getRandomPointInTriangle());
+        lastPoint = getRandomPointInTriangle();
     }
 
     private Point2D getRandomPointInTriangle() {
@@ -88,8 +93,9 @@ public class SierpinskiApplication extends Application {
         /*por cada iteración selecciona una esquina del triángulo aleatoriamente
         y obtiene el punto medio entre ella y el anterior punto creado*/
         Point2D random = getRandomPoint();
-        Point2D last = points.get(points.size() - 1);
-        points.add(getMidpoint(random, last));
+        //Point2D last = points.get(points.size() - 1);
+        //points.add(getMidpoint(random, last));
+        lastPoint = getMidpoint(random, lastPoint);
 
         counter++;
     }
@@ -107,7 +113,7 @@ public class SierpinskiApplication extends Application {
     }
 
     private void render(GraphicsContext g) {
-        g.clearRect(0, 0, w, h);
+        //g.clearRect(0, 0, w, h);
 
         g.setStroke(Color.BLACK);
         g.setFill(new Color(0.5, 0, 1, 1));
@@ -126,12 +132,17 @@ public class SierpinskiApplication extends Application {
     }
 
     private void renderPoints(GraphicsContext g, double width) {
-        for (Point2D p: points) {
+        /*for (Point2D p: points) {
             g.fillRect(
                     p.getX() - width / 2,
                     p.getY() - width / 2,
                     width, width);
-        }
+        }*/
+
+        g.fillRect(
+                lastPoint.getX() - width / 2,
+                lastPoint.getY() - width / 2,
+                width, width);
     }
 
 
