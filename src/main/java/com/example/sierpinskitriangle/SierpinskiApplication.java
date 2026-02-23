@@ -16,7 +16,10 @@ import java.util.ArrayList;
 public class SierpinskiApplication extends Application {
 
     private int w, h;
-    private int s; //longitud de los lados del triangulo
+    private int s;//longitud de los lados del triangulo
+
+    private int limit;
+    private int counter;
 
     private Point2D[] triangle;
     private ArrayList <Point2D> points;
@@ -26,6 +29,9 @@ public class SierpinskiApplication extends Application {
         w = 800;
         h = 800;
         s = 600;
+
+        limit = 10000;
+        counter = 0;
 
         Canvas canvas = new Canvas(w,h);
         GraphicsContext g = canvas.getGraphicsContext2D();
@@ -77,13 +83,15 @@ public class SierpinskiApplication extends Application {
     }
 
     private void update() {
+        if (counter > limit) return;
+
         /*por cada iteración selecciona una esquina del triángulo aleatoriamente
         y obtiene el punto medio entre ella y el anterior punto creado*/
-
         Point2D random = getRandomPoint();
         Point2D last = points.get(points.size() - 1);
-
         points.add(getMidpoint(random, last));
+
+        counter++;
     }
 
     private Point2D getRandomPoint() {
@@ -109,6 +117,12 @@ public class SierpinskiApplication extends Application {
 
         g.strokePolygon(xPoints, yPoints, 3);
         renderPoints(g, 1);
+
+        //dibuja el indicador de que ya llegó al limite
+        if (counter > limit) {
+            g.setFill(Color.RED);
+            g.fillRect(20, 20, 20, 20);
+        }
     }
 
     private void renderPoints(GraphicsContext g, double width) {
